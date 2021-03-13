@@ -14,6 +14,7 @@ class Piece:
         self.j = y
         self.value = v
         self.total_neighbors = 0
+        self.prob = 0
 
 
 def draw_grid(screen):
@@ -26,8 +27,6 @@ def draw_grid(screen):
 
         pygame.draw.line(screen, (255, 255, 255), (x, 0), (x, size))
         pygame.draw.line(screen, (255, 255, 255), (0, y), (size, y))
-
-    pygame.display.update()
 
 
 def initialize_game():
@@ -53,6 +52,7 @@ def loadImages():
 
 
 def update_screen(screen):
+    screen.fill((255, 255, 255))
     topLeft = (0, 0);
     for i in range(dim):
         for j in range(dim):
@@ -90,6 +90,10 @@ def update_screen(screen):
             topLeft = topLeft[0] + (size // dim), topLeft[1]
         topLeft = 0, topLeft[1] + (size // dim)
 
+    draw_grid(screen)
+    pygame.display.update()
+    time.sleep(time_sleep)
+
 
 def num_visited():
     count = 0
@@ -107,7 +111,6 @@ def get_all_not_visited():
         for j in range(dim):
             if not minefield[i][j].visited:
                 arr.append(minefield[i][j])
-
     return arr
 
 
@@ -214,7 +217,7 @@ def basic():
                             minefield[i + 1][j + 1].falgged = True
     end_count = num_visited()
 
-    #print("start: " + str(start_count) + "end: " + str(end_count))
+    # print("start: " + str(start_count) + "end: " + str(end_count))
 
     if start_count == end_count:
         # visit a random state
@@ -223,6 +226,8 @@ def basic():
             rand = random.randint(0, len(arr) - 1)
             arr[rand].visited = True
 
+            # print("i: " + str(arr[rand].i) + " j: " + str(arr[rand].j) + " value: " + str(arr[rand].value))
+
     # indite when to stop
     if end_count == (dim * dim):
         return False
@@ -230,25 +235,200 @@ def basic():
         return True
 
 
+def get_neighbors(point):
+    arr = []
+
+    if (point.i - 1) >= 0:
+        if minefield[point.i - 1][point.j].visited:
+            arr.append(minefield[point.i - 1][point.j])
+    if (point.j - 1) >= 0:
+        if minefield[point.i][point.j - 1].visited:
+            arr.append(minefield[point.i][point.j - 1])
+    if (point.i + 1) < dim:
+        if minefield[point.i + 1][point.j].visited:
+            arr.append(minefield[point.i + 1][point.j])
+    if (point.j + 1) < dim:
+        if minefield[point.i][point.j + 1].visited:
+            arr.append(minefield[point.i][point.j + 1])
+    if ((point.i - 1) >= 0) & ((point.j - 1) >= 0):
+        if minefield[point.i - 1][point.j - 1].visited:
+            arr.append(minefield[point.i - 1][point.j - 1])
+    if ((point.i - 1) >= 0) & ((point.j + 1) < dim):
+        if minefield[point.i - 1][point.j + 1].visited:
+            arr.append(minefield[point.i - 1][point.j + 1])
+    if ((point.i + 1) < dim) & ((point.j - 1) >= 0):
+        if minefield[point.i + 1][point.j - 1].visited:
+            arr.append(minefield[point.i + 1][point.j - 1])
+    if ((point.i + 1) < dim) & ((point.j + 1) < dim):
+        if minefield[point.i + 1][point.j + 1].visited:
+            arr.append(minefield[point.i + 1][point.j + 1])
+
+    return arr
+
+
+def get_number_of_not_visited_neighbors(point):
+    count = 0
+    if (point.i - 1) >= 0:
+        if not minefield[point.i - 1][point.j].visited:
+            count += 1
+    if (point.j - 1) >= 0:
+        if not minefield[point.i][point.j - 1].visited:
+            count += 1
+    if (point.i + 1) < dim:
+        if not minefield[point.i + 1][point.j].visited:
+            count += 1
+    if (point.j + 1) < dim:
+        if not minefield[point.i][point.j + 1].visited:
+            count += 1
+    if ((point.i - 1) >= 0) & ((point.j - 1) >= 0):
+        if not minefield[point.i - 1][point.j - 1].visited:
+            count += 1
+    if ((point.i - 1) >= 0) & ((point.j + 1) < dim):
+        if not minefield[point.i - 1][point.j + 1].visited:
+            count += 1
+    if ((point.i + 1) < dim) & ((point.j - 1) >= 0):
+        if not minefield[point.i + 1][point.j - 1].visited:
+            count += 1
+    if ((point.i + 1) < dim) & ((point.j + 1) < dim):
+        if not minefield[point.i + 1][point.j + 1].visited:
+            count += 1
+
+    return count
+
+
+def get_number_of_visited_neighbor_mines(point):
+    count = 0
+    if (point.i - 1) >= 0:
+        if minefield[point.i - 1][point.j].visited & minefield[point.i - 1][point.j].mine:
+            count += 1
+    if (point.j - 1) >= 0:
+        if minefield[point.i][point.j - 1].visited & minefield[point.i][point.j - 1].mine:
+            count += 1
+    if (point.i + 1) < dim:
+        if minefield[point.i + 1][point.j].visited & minefield[point.i + 1][point.j].mine:
+            count += 1
+    if (point.j + 1) < dim:
+        if minefield[point.i][point.j + 1].visited & minefield[point.i][point.j + 1].mine:
+            count += 1
+    if ((point.i - 1) >= 0) & ((point.j - 1) >= 0):
+        if minefield[point.i - 1][point.j - 1].visited & minefield[point.i - 1][point.j - 1].mine:
+            count += 1
+    if ((point.i - 1) >= 0) & ((point.j + 1) < dim):
+        if minefield[point.i - 1][point.j + 1].visited & minefield[point.i - 1][point.j + 1].mine:
+            count += 1
+    if ((point.i + 1) < dim) & ((point.j - 1) >= 0):
+        if minefield[point.i + 1][point.j - 1].visited & minefield[point.i + 1][point.j - 1].mine:
+            count += 1
+    if ((point.i + 1) < dim) & ((point.j + 1) < dim):
+        if minefield[point.i + 1][point.j + 1].visited & minefield[point.i + 1][point.j + 1].mine:
+            count += 1
+
+    return count
+
+
+def calculate_prob(point):
+    neighbors = get_neighbors(point)
+
+    prob = 0.5
+    count = 0
+
+    for i in neighbors:
+
+        num_of_mines_left = i.value - get_number_of_visited_neighbor_mines(i)
+        num_of_not_visited_neighbors = get_number_of_not_visited_neighbors(i)
+
+        if num_of_mines_left == 0:
+            # this is a safe neighbor
+            return 0
+        if num_of_mines_left == num_of_not_visited_neighbors:
+            # this is a mine for sure
+            return 1
+
+        prob += num_of_mines_left / num_of_not_visited_neighbors
+        count += 1
+
+    if ( count == 0):
+        return 0.5
+    else:
+        return prob / count
+
+
+def strat2(screen):
+    start_count = num_visited()
+
+    # for each cell not visited calculate its probability
+    for i in range(dim):
+        for j in range(dim):
+
+            if not minefield[i][j].visited:
+                prob = calculate_prob(minefield[i][j])
+                if prob == 0:
+                    # safe cell, mark it as visited
+                    minefield[i][j].visited = True
+                    print("SAFE i: " + str(i) + " j: " + str(j) + " " + str(minefield[i][j].prob))
+                if prob == 1:
+                    # mine 100% for flag it
+                    minefield[i][j].visited = True
+                    minefield[i][j].flagged = True
+                    print("MINE i: " + str(i) + " j: " + str(j) + " " + str(minefield[i][j].prob))
+
+            update_screen(screen)
+
+    end_count = num_visited()
+
+    print("start: " + str(start_count) + "end: " + str(end_count))
+
+    # if end = star, # pick the one with the min prob
+    if end_count < dim*dim:
+        if start_count == end_count:
+
+            # pick a point with the min prob
+            min_prob = 1
+            x = 0
+            y = 0
+            for i in range(dim):
+                for j in range(dim):
+                    if (minefield[i][j].prob < min_prob) & (minefield[i][j].visited == False):
+                        print("i: " + str(minefield[i][j].i) + " j: " + str(minefield[i][j].j) + " " + str(
+                            minefield[i][j].prob))
+
+                        min_prob = minefield[i][j].prob
+                        x = i
+                        y = j
+
+            minefield[x][y].visited = True
+            print("Marked random as visited i: " + str(x) + " j: " + str(y) + " " + str(minefield[i][j].prob))
+            update_screen(screen)
+
+            # true so keep going
+            return True
+
+    # searched all so u can stop now
+    if end_count == (dim * dim):
+        print("start: " + str(start_count) + "end: " + str(end_count))
+        return False
+
+    return True
+
+
 def game_loop(screen):
     # game loop
     running = True
     while running:
-        # background color RGB
-        screen.fill((255, 255, 255))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        if not basic():
-            break
+        if strat == 1:
+            if not basic():
+                break
+        else:
+            if not strat2(screen):
+
+                break
 
         update_screen(screen)
-        draw_grid(screen)
-        pygame.display.update()
-
-        time.sleep(1)
 
 
 def create_minefield():
@@ -322,6 +502,7 @@ def initialize_minefield():
     arr = assign_mine_values(arr)
     return arr
 
+
 def get_falgged_count():
     count = 0
     for i in range(dim):
@@ -330,15 +511,21 @@ def get_falgged_count():
                 count += 1
     return count
 
+
 def main():
-    global dim, num_mines, minefield, size
+    global dim, num_mines, minefield, size, time_sleep, strat
+
+    time_sleep = 0.1
 
     # size of the screen
-    size = 500
+    size = 1000
 
     dim = int(input("Enter the dimension of minefield: "))
     num_mines = int(input("Enter the number of mines:  "))
+    strat = int(input("Strat 1 (basic) or Strat 2 (smart). Enter 1 or 2 "))
 
+    if (strat == 1):
+        time_sleep = 1
     # get all the sprites10
     loadImages()
 
@@ -346,10 +533,15 @@ def main():
 
     screen = initialize_game()
 
+    # pick a random point to be visited first
+    rand_i = random.randint(0, dim - 1)
+    rand_j = random.randint(0, dim - 1)
+    minefield[rand_i][rand_j].visited = True
+
     game_loop(screen)
 
     print("There were " + str(num_mines) + " and " + str(get_falgged_count()) + " were flagged")
-    print("success rate: " + str(get_falgged_count()/num_mines))
+    print("success rate: " + str(get_falgged_count() / num_mines))
 
 
 main()
