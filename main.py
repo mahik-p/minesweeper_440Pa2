@@ -109,7 +109,7 @@ def num_visited_mines():
     count = 0
     for i in range(dim):
         for j in range(dim):
-            if minefield[i][j].visited & minefield[i][j].mine:
+            if minefield[i][j].visited and minefield[i][j].mine:
                 count += 1
     return count
 
@@ -142,44 +142,44 @@ def basic():
                 num_safe = 0
                 # count the number of visited cells that are mines & the number of visited safe cells
                 if (i - 1) >= 0:
-                    if minefield[i - 1][j].mine & minefield[i - 1][j].visited:
+                    if minefield[i - 1][j].mine and minefield[i - 1][j].visited:
                         num_mines += 1
-                    if minefield[i - 1][j].visited & (minefield[i - 1][j].mine == False):
+                    if minefield[i - 1][j].visited and (minefield[i - 1][j].mine == False):
                         num_safe += 1
                 if (j - 1) >= 0:
-                    if minefield[i][j - 1].mine & minefield[i][j - 1].visited:
+                    if minefield[i][j - 1].mine and minefield[i][j - 1].visited:
                         num_mines += 1
-                    if minefield[i][j - 1].visited & (minefield[i][j - 1].mine == False):
+                    if minefield[i][j - 1].visited and (minefield[i][j - 1].mine == False):
                         num_safe += 1
                 if (i + 1) < dim:
-                    if minefield[i + 1][j].mine & minefield[i + 1][j].visited:
+                    if minefield[i + 1][j].mine and minefield[i + 1][j].visited:
                         num_mines += 1
-                    if minefield[i + 1][j].visited & (minefield[i + 1][j].mine == False):
+                    if minefield[i + 1][j].visited and (minefield[i + 1][j].mine == False):
                         num_safe += 1
                 if (j + 1) < dim:
-                    if minefield[i][j + 1].mine & minefield[i][j + 1].visited:
+                    if minefield[i][j + 1].mine and minefield[i][j + 1].visited:
                         num_mines += 1
-                    if minefield[i][j + 1].visited & (minefield[i][j + 1].mine == False):
+                    if minefield[i][j + 1].visited and (minefield[i][j + 1].mine == False):
                         num_safe += 1
-                if ((i - 1) >= 0) & ((j - 1) >= 0):
-                    if minefield[i - 1][j - 1].mine & minefield[i - 1][j - 1].visited:
+                if ((i - 1) >= 0) and ((j - 1) >= 0):
+                    if minefield[i - 1][j - 1].mine and minefield[i - 1][j - 1].visited:
                         num_mines += 1
-                    if minefield[i - 1][j - 1].visited & (minefield[i - 1][j - 1].mine == False):
+                    if minefield[i - 1][j - 1].visited and (minefield[i - 1][j - 1].mine == False):
                         num_safe += 1
-                if ((i - 1) >= 0) & ((j + 1) < dim):
-                    if minefield[i - 1][j + 1].mine & minefield[i - 1][j + 1].visited:
+                if ((i - 1) >= 0) and ((j + 1) < dim):
+                    if minefield[i - 1][j + 1].mine and minefield[i - 1][j + 1].visited:
                         num_mines += 1
-                    if minefield[i - 1][j + 1].visited & (minefield[i - 1][j + 1].mine == False):
+                    if minefield[i - 1][j + 1].visited and (minefield[i - 1][j + 1].mine == False):
                         num_safe += 1
-                if ((i + 1) < dim) & ((j - 1) >= 0):
-                    if minefield[i + 1][j - 1].mine & minefield[i + 1][j - 1].visited:
+                if ((i + 1) < dim) and ((j - 1) >= 0):
+                    if minefield[i + 1][j - 1].mine and minefield[i + 1][j - 1].visited:
                         num_mines += 1
-                    if minefield[i + 1][j - 1].visited & (minefield[i + 1][j - 1].mine == False):
+                    if minefield[i + 1][j - 1].visited and (minefield[i + 1][j - 1].mine == False):
                         num_safe += 1
-                if ((i + 1) < dim) & ((j + 1) < dim):
-                    if minefield[i + 1][j + 1].mine & minefield[i + 1][j + 1].mine:
+                if ((i + 1) < dim) and ((j + 1) < dim):
+                    if minefield[i + 1][j + 1].mine and minefield[i + 1][j + 1].mine:
                         num_mines += 1
-                    if minefield[i + 1][j + 1].visited & (minefield[i + 1][j + 1].mine == False):
+                    if minefield[i + 1][j + 1].visited and (minefield[i + 1][j + 1].mine == False):
                         num_safe += 1
                 if minefield[i][j].value == num_mines:
                     # all other not visited neighbors are safe to visit
@@ -191,13 +191,13 @@ def basic():
                         minefield[i + 1][j].visited = True
                     if (j + 1) < dim:
                         minefield[i][j + 1].visited = True
-                    if ((i - 1) >= 0) & ((j - 1) >= 0):
+                    if ((i - 1) >= 0) and ((j - 1) >= 0):
                         minefield[i - 1][j - 1].visited = True
-                    if ((i - 1) >= 0) & ((j + 1) < dim):
+                    if ((i - 1) >= 0) and ((j + 1) < dim):
                         minefield[i - 1][j + 1].visited = True
-                    if ((i + 1) < dim) & ((j - 1) >= 0):
+                    if ((i + 1) < dim) and ((j - 1) >= 0):
                         minefield[i + 1][j - 1].visited = True
-                    if ((i + 1) < dim) & ((j + 1) < dim):
+                    if ((i + 1) < dim) and ((j + 1) < dim):
                         minefield[i + 1][j + 1].visited = True
 
                 if minefield[i][j].total_neighbors - num_safe == minefield[i][j].value:
@@ -218,19 +218,19 @@ def basic():
                         if not minefield[i][j + 1].visited:
                             minefield[i][j + 1].visited = True
                             minefield[i][j + 1].flagged = True
-                    if ((i - 1) >= 0) & ((j - 1) >= 0):
+                    if ((i - 1) >= 0) and ((j - 1) >= 0):
                         if not minefield[i - 1][j - 1].visited:
                             minefield[i - 1][j - 1].visited = True
                             minefield[i - 1][j - 1].flagged = True
-                    if ((i - 1) >= 0) & ((j + 1) < dim):
+                    if ((i - 1) >= 0) and ((j + 1) < dim):
                         if not minefield[i - 1][j - 1].visited:
                             minefield[i - 1][j - 1].visited = True
                             minefield[i - 1][j - 1].flagged = True
-                    if ((i + 1) < dim) & ((j - 1) >= 0):
+                    if ((i + 1) < dim) and ((j - 1) >= 0):
                         if not minefield[i + 1][j - 1].visited:
                             minefield[i + 1][j - 1].visited = True
                             minefield[i + 1][j - 1].falgged = True
-                    if ((i + 1) < dim) & ((j + 1) < dim):
+                    if ((i + 1) < dim) and ((j + 1) < dim):
                         if not minefield[i + 1][j + 1].visited:
                             minefield[i + 1][j + 1].visited = True
                             minefield[i + 1][j + 1].falgged = True
@@ -270,16 +270,16 @@ def get_neighbors(point):
     if (point.j + 1) < dim:
         if minefield[point.i][point.j + 1].visited:
             arr.append(minefield[point.i][point.j + 1])
-    if ((point.i - 1) >= 0) & ((point.j - 1) >= 0):
+    if ((point.i - 1) >= 0) and ((point.j - 1) >= 0):
         if minefield[point.i - 1][point.j - 1].visited:
             arr.append(minefield[point.i - 1][point.j - 1])
-    if ((point.i - 1) >= 0) & ((point.j + 1) < dim):
+    if ((point.i - 1) >= 0) and ((point.j + 1) < dim):
         if minefield[point.i - 1][point.j + 1].visited:
             arr.append(minefield[point.i - 1][point.j + 1])
-    if ((point.i + 1) < dim) & ((point.j - 1) >= 0):
+    if ((point.i + 1) < dim) and ((point.j - 1) >= 0):
         if minefield[point.i + 1][point.j - 1].visited:
             arr.append(minefield[point.i + 1][point.j - 1])
-    if ((point.i + 1) < dim) & ((point.j + 1) < dim):
+    if ((point.i + 1) < dim) and ((point.j + 1) < dim):
         if minefield[point.i + 1][point.j + 1].visited:
             arr.append(minefield[point.i + 1][point.j + 1])
 
@@ -300,16 +300,16 @@ def get_number_of_not_visited_neighbors(point):
     if (point.j + 1) < dim:
         if not minefield[point.i][point.j + 1].visited:
             count += 1
-    if ((point.i - 1) >= 0) & ((point.j - 1) >= 0):
+    if ((point.i - 1) >= 0) and ((point.j - 1) >= 0):
         if not minefield[point.i - 1][point.j - 1].visited:
             count += 1
-    if ((point.i - 1) >= 0) & ((point.j + 1) < dim):
+    if ((point.i - 1) >= 0) and ((point.j + 1) < dim):
         if not minefield[point.i - 1][point.j + 1].visited:
             count += 1
-    if ((point.i + 1) < dim) & ((point.j - 1) >= 0):
+    if ((point.i + 1) < dim) and ((point.j - 1) >= 0):
         if not minefield[point.i + 1][point.j - 1].visited:
             count += 1
-    if ((point.i + 1) < dim) & ((point.j + 1) < dim):
+    if ((point.i + 1) < dim) and ((point.j + 1) < dim):
         if not minefield[point.i + 1][point.j + 1].visited:
             count += 1
 
@@ -319,28 +319,28 @@ def get_number_of_not_visited_neighbors(point):
 def get_number_of_visited_neighbor_mines(point):
     count = 0
     if (point.i - 1) >= 0:
-        if minefield[point.i - 1][point.j].visited & minefield[point.i - 1][point.j].mine:
+        if minefield[point.i - 1][point.j].visited and minefield[point.i - 1][point.j].mine:
             count += 1
     if (point.j - 1) >= 0:
-        if minefield[point.i][point.j - 1].visited & minefield[point.i][point.j - 1].mine:
+        if minefield[point.i][point.j - 1].visited and minefield[point.i][point.j - 1].mine:
             count += 1
     if (point.i + 1) < dim:
-        if minefield[point.i + 1][point.j].visited & minefield[point.i + 1][point.j].mine:
+        if minefield[point.i + 1][point.j].visited and minefield[point.i + 1][point.j].mine:
             count += 1
     if (point.j + 1) < dim:
-        if minefield[point.i][point.j + 1].visited & minefield[point.i][point.j + 1].mine:
+        if minefield[point.i][point.j + 1].visited and minefield[point.i][point.j + 1].mine:
             count += 1
     if ((point.i - 1) >= 0) & ((point.j - 1) >= 0):
-        if minefield[point.i - 1][point.j - 1].visited & minefield[point.i - 1][point.j - 1].mine:
+        if minefield[point.i - 1][point.j - 1].visited and minefield[point.i - 1][point.j - 1].mine:
             count += 1
     if ((point.i - 1) >= 0) & ((point.j + 1) < dim):
-        if minefield[point.i - 1][point.j + 1].visited & minefield[point.i - 1][point.j + 1].mine:
+        if minefield[point.i - 1][point.j + 1].visited and minefield[point.i - 1][point.j + 1].mine:
             count += 1
     if ((point.i + 1) < dim) & ((point.j - 1) >= 0):
-        if minefield[point.i + 1][point.j - 1].visited & minefield[point.i + 1][point.j - 1].mine:
+        if minefield[point.i + 1][point.j - 1].visited and minefield[point.i + 1][point.j - 1].mine:
             count += 1
     if ((point.i + 1) < dim) & ((point.j + 1) < dim):
-        if minefield[point.i + 1][point.j + 1].visited & minefield[point.i + 1][point.j + 1].mine:
+        if minefield[point.i + 1][point.j + 1].visited and minefield[point.i + 1][point.j + 1].mine:
             count += 1
 
     return count
@@ -373,6 +373,7 @@ def calculate_prob(point):
         return 0.5
     else:
         return prob / count
+
 
 
 def strat2(screen):
@@ -415,7 +416,7 @@ def strat2(screen):
             y = 0
             for i in range(dim):
                 for j in range(dim):
-                    if (minefield[i][j].prob < min_prob) & (minefield[i][j].visited == False):
+                    if (minefield[i][j].prob < min_prob) and (minefield[i][j].visited == False):
                         # print("i: " + str(minefield[i][j].i) + " j: " + str(minefield[i][j].j) + " " + str(minefield[i][j].prob))
 
                         min_prob = minefield[i][j].prob
@@ -532,7 +533,7 @@ def get_falgged_count():
     count = 0
     for i in range(dim):
         for j in range(dim):
-            if minefield[i][j].mine & minefield[i][j].flagged:
+            if minefield[i][j].mine and minefield[i][j].flagged:
                 count += 1
     return count
 
@@ -551,7 +552,7 @@ def main():
 
     if (strat == 1):
         time_sleep = 1
-    if (strat == 2 & dim > 10):
+    if (strat == 2 and dim > 10):
         time_sleep = 0
     # get all the sprites10
     loadImages()
@@ -582,8 +583,8 @@ def testing_main():
     size = 1000
 
     dim = 10
-    num_mines = 40
-    strat = 2
+    num_mines = 30
+    strat = 1
 
     # get all the sprites10
     loadImages()
