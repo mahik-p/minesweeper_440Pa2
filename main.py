@@ -105,6 +105,15 @@ def num_visited():
     return count
 
 
+def num_visited_mines():
+    count = 0
+    for i in range(dim):
+        for j in range(dim):
+            if minefield[i][j].visited & minefield[i][j].mine:
+                count += 1
+    return count
+
+
 def get_all_not_visited():
     arr = []
     for i in range(dim):
@@ -112,6 +121,15 @@ def get_all_not_visited():
             if not minefield[i][j].visited:
                 arr.append(minefield[i][j])
     return arr
+
+
+def mark_not_visited_as_mines():
+    for i in range(dim):
+        for j in range(dim):
+            if not minefield[i][j].visited:
+                minefield[i][j].visited = True
+                if minefield[i][j].mine:
+                    minefield[i][j].flagged = True
 
 
 def basic():
@@ -181,6 +199,7 @@ def basic():
                         minefield[i + 1][j - 1].visited = True
                     if ((i + 1) < dim) & ((j + 1) < dim):
                         minefield[i + 1][j + 1].visited = True
+
                 if minefield[i][j].total_neighbors - num_safe == minefield[i][j].value:
                     # all other not visited neighbors are mines -> flag them
                     if (i - 1) >= 0:
@@ -215,6 +234,7 @@ def basic():
                         if not minefield[i + 1][j + 1].visited:
                             minefield[i + 1][j + 1].visited = True
                             minefield[i + 1][j + 1].falgged = True
+
     end_count = num_visited()
 
     # print("start: " + str(start_count) + "end: " + str(end_count))
@@ -334,20 +354,22 @@ def calculate_prob(point):
 
     for i in neighbors:
 
-        num_of_mines_left = i.value - get_number_of_visited_neighbor_mines(i)
-        num_of_not_visited_neighbors = get_number_of_not_visited_neighbors(i)
+        # if the neighbor is a mine do not use it for calculation
+        if not i.mine:
+            num_of_mines_left = i.value - get_number_of_visited_neighbor_mines(i)
+            num_of_not_visited_neighbors = get_number_of_not_visited_neighbors(i)
 
-        if num_of_mines_left == 0:
-            # this is a safe neighbor
-            return 0
-        if num_of_mines_left == num_of_not_visited_neighbors:
-            # this is a mine for sure
-            return 1
+            if num_of_mines_left == 0:
+                # this is a safe neighbor
+                return 0
+            if num_of_mines_left == num_of_not_visited_neighbors:
+                # this is a mine for sure
+                return 1
 
-        prob += num_of_mines_left / num_of_not_visited_neighbors
-        count += 1
+            prob += num_of_mines_left / num_of_not_visited_neighbors
+            count += 1
 
-    if ( count == 0):
+    if count == 0:
         return 0.5
     else:
         return prob / count
@@ -365,21 +387,26 @@ def strat2(screen):
                 if prob == 0:
                     # safe cell, mark it as visited
                     minefield[i][j].visited = True
-                    print("SAFE i: " + str(i) + " j: " + str(j) + " " + str(minefield[i][j].prob))
+                    # print("SAFE i: " + str(i) + " j: " + str(j) + " " + str(minefield[i][j].prob))
                 if prob == 1:
                     # mine 100% for flag it
                     minefield[i][j].visited = True
                     minefield[i][j].flagged = True
-                    print("MINE i: " + str(i) + " j: " + str(j) + " " + str(minefield[i][j].prob))
+                    # print("MINE i: " + str(i) + " j: " + str(j) + " " + str(minefield[i][j].prob))
 
             update_screen(screen)
 
     end_count = num_visited()
 
-    print("start: " + str(start_count) + "end: " + str(end_count))
+    # print("start: " + str(start_count) + "end: " + str(end_count))
 
     # if end = star, # pick the one with the min prob
-    if end_count < dim*dim:
+    if end_count < dim * dim:
+        # if total mines - number of mines discovered = empty blocks then all of them are mines
+        if num_mines - num_visited_mines() == len(get_all_not_visited()):
+            # every not visited block is a mine
+            mark_not_visited_as_mines()
+
         if start_count == end_count:
 
             # pick a point with the min prob
@@ -389,15 +416,14 @@ def strat2(screen):
             for i in range(dim):
                 for j in range(dim):
                     if (minefield[i][j].prob < min_prob) & (minefield[i][j].visited == False):
-                        print("i: " + str(minefield[i][j].i) + " j: " + str(minefield[i][j].j) + " " + str(
-                            minefield[i][j].prob))
+                        # print("i: " + str(minefield[i][j].i) + " j: " + str(minefield[i][j].j) + " " + str(minefield[i][j].prob))
 
                         min_prob = minefield[i][j].prob
                         x = i
                         y = j
 
             minefield[x][y].visited = True
-            print("Marked random as visited i: " + str(x) + " j: " + str(y) + " " + str(minefield[i][j].prob))
+            # print("Marked random as visited i: " + str(x) + " j: " + str(y) + " " + str(minefield[i][j].prob))
             update_screen(screen)
 
             # true so keep going
@@ -405,7 +431,7 @@ def strat2(screen):
 
     # searched all so u can stop now
     if end_count == (dim * dim):
-        print("start: " + str(start_count) + "end: " + str(end_count))
+        # print("start: " + str(start_count) + "end: " + str(end_count))
         return False
 
     return True
@@ -425,7 +451,6 @@ def game_loop(screen):
                 break
         else:
             if not strat2(screen):
-
                 break
 
         update_screen(screen)
@@ -526,6 +551,8 @@ def main():
 
     if (strat == 1):
         time_sleep = 1
+    if (strat == 2 & dim > 10):
+        time_sleep = 0
     # get all the sprites10
     loadImages()
 
@@ -544,4 +571,45 @@ def main():
     print("success rate: " + str(get_falgged_count() / num_mines))
 
 
-main()
+#main()
+
+def testing_main():
+    global dim, num_mines, minefield, size, time_sleep, strat
+
+    time_sleep = 0.0
+
+    # size of the screen
+    size = 1000
+
+    dim = 10
+    num_mines = 40
+    strat = 2
+
+    # get all the sprites10
+    loadImages()
+
+    minefield = initialize_minefield()
+
+    screen = initialize_game()
+
+    # pick a random point to be visited first
+    rand_i = random.randint(0, dim - 1)
+    rand_j = random.randint(0, dim - 1)
+    minefield[rand_i][rand_j].visited = True
+
+    game_loop(screen)
+
+    print("There were " + str(num_mines) + " and " + str(get_falgged_count()) + " were flagged")
+    print("success rate: " + str(get_falgged_count() / num_mines))
+
+    return get_falgged_count() / num_mines
+
+
+def test():
+    total = 0
+    for i in range(10):
+        total += testing_main()
+    print(str(total / 10))
+
+
+test()
