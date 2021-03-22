@@ -60,7 +60,7 @@ def update_screen(screen):
             # if its visited end update the screen else keep it blank
             if minefield[i][j].visited:
 
-                if minefield[i][j].mine & minefield[i][j].flagged:
+                if minefield[i][j].mine and minefield[i][j].flagged:
                     image = images["no_bomb"]
                 elif minefield[i][j].mine:
                     image = images["explosion"]
@@ -330,16 +330,16 @@ def get_number_of_visited_neighbor_mines(point):
     if (point.j + 1) < dim:
         if minefield[point.i][point.j + 1].visited and minefield[point.i][point.j + 1].mine:
             count += 1
-    if ((point.i - 1) >= 0) & ((point.j - 1) >= 0):
+    if ((point.i - 1) >= 0) and ((point.j - 1) >= 0):
         if minefield[point.i - 1][point.j - 1].visited and minefield[point.i - 1][point.j - 1].mine:
             count += 1
-    if ((point.i - 1) >= 0) & ((point.j + 1) < dim):
+    if ((point.i - 1) >= 0) and ((point.j + 1) < dim):
         if minefield[point.i - 1][point.j + 1].visited and minefield[point.i - 1][point.j + 1].mine:
             count += 1
-    if ((point.i + 1) < dim) & ((point.j - 1) >= 0):
+    if ((point.i + 1) < dim) and ((point.j - 1) >= 0):
         if minefield[point.i + 1][point.j - 1].visited and minefield[point.i + 1][point.j - 1].mine:
             count += 1
-    if ((point.i + 1) < dim) & ((point.j + 1) < dim):
+    if ((point.i + 1) < dim) and ((point.j + 1) < dim):
         if minefield[point.i + 1][point.j + 1].visited and minefield[point.i + 1][point.j + 1].mine:
             count += 1
 
@@ -501,19 +501,19 @@ def assign_mine_values(arr):
                 count_neighbors += 1
                 if arr[i][j + 1].mine:
                     count += 1
-            if ((i - 1) >= 0) & ((j - 1) >= 0):
+            if ((i - 1) >= 0) and ((j - 1) >= 0):
                 count_neighbors += 1
                 if arr[i - 1][j - 1].mine:
                     count += 1
-            if ((i - 1) >= 0) & ((j + 1) < dim):
+            if ((i - 1) >= 0) and ((j + 1) < dim):
                 count_neighbors += 1
                 if arr[i - 1][j + 1].mine:
                     count += 1
-            if ((i + 1) < dim) & ((j - 1) >= 0):
+            if ((i + 1) < dim) and ((j - 1) >= 0):
                 count_neighbors += 1
                 if arr[i + 1][j - 1].mine:
                     count += 1
-            if ((i + 1) < dim) & ((j + 1) < dim):
+            if ((i + 1) < dim) and ((j + 1) < dim):
                 count_neighbors += 1
                 if arr[i + 1][j + 1].mine:
                     count += 1
