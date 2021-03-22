@@ -137,7 +137,7 @@ def basic():
 
     for i in range(dim):
         for j in range(dim):
-            if minefield[i][j].visited:
+            if minefield[i][j].visited and minefield[i][j].mine == False:
                 num_mines = 0
                 num_safe = 0
                 # count the number of visited cells that are mines & the number of visited safe cells
@@ -375,7 +375,6 @@ def calculate_prob(point):
         return prob / count
 
 
-
 def strat2(screen):
     start_count = num_visited()
 
@@ -572,7 +571,7 @@ def main():
     print("success rate: " + str(get_falgged_count() / num_mines))
 
 
-#main()
+main()
 
 def testing_main():
     global dim, num_mines, minefield, size, time_sleep, strat
@@ -583,7 +582,7 @@ def testing_main():
     size = 1000
 
     dim = 10
-    num_mines = 30
+    num_mines = 90
     strat = 1
 
     # get all the sprites10
@@ -613,4 +612,4 @@ def test():
     print(str(total / 10))
 
 
-test()
+#test()
