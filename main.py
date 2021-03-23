@@ -4,6 +4,19 @@ import os
 import time
 
 """
+    Global Variables
+    
+    dim = dimension of the minefield
+    num_mines = total number of mines
+    minefield = the actual minefield being modified
+    size = size of the pygame screen
+    time_sleep = time_sleep between each screen update
+    strat = which strategy to use
+
+"""
+
+
+"""
      The Piece class
         mine = (True if the piece is a mine)
         visited = (True if the piece is visited by the algorithm)
