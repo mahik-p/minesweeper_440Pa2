@@ -3,6 +3,19 @@ import random
 import os
 import time
 
+"""
+     The Piece class
+        mine = (True if the piece is a mine)
+        visited = (True if the piece is visited by the algorithm)
+        flagged = (True if the piece is visited by the algorithm)
+        i = the (x,_) coordinate on the minefield of the piece
+        j = the (_,y) coordinate on the minefield of the piece
+        value = the number of mines around the piece
+        total_neighbors = number of neighbors around the piece
+        prob = (0 = safe, 1 = mine, anything in between is maybe)
+    
+"""
+
 
 class Piece:
 
@@ -17,6 +30,11 @@ class Piece:
         self.prob = 0
 
 
+"""
+    This draws the grid on the pygame display
+"""
+
+
 def draw_grid(screen):
     distance = size // dim
     x = 0
@@ -27,6 +45,11 @@ def draw_grid(screen):
 
         pygame.draw.line(screen, (255, 255, 255), (x, 0), (x, size))
         pygame.draw.line(screen, (255, 255, 255), (0, y), (size, y))
+
+
+"""
+    Used to start the pygame
+"""
 
 
 def initialize_game():
@@ -41,6 +64,11 @@ def initialize_game():
     return screen
 
 
+"""
+    This loads all the images used for pygame to images
+"""
+
+
 def loadImages():
     global images
     images = {}
@@ -49,6 +77,12 @@ def loadImages():
             image = pygame.image.load(fileName)
             image = pygame.transform.scale(image, (size // dim, size // dim))
             images[fileName.split(".")[0]] = image
+
+
+"""
+    Everytime this is called the screen in pygame updates to the 
+    visited pieces visited
+"""
 
 
 def update_screen(screen):
@@ -95,6 +129,11 @@ def update_screen(screen):
     time.sleep(time_sleep)
 
 
+"""
+    This returns the number of visited pieces in the minefield
+"""
+
+
 def num_visited():
     count = 0
     for i in range(dim):
@@ -103,6 +142,11 @@ def num_visited():
                 count += 1
 
     return count
+
+
+"""
+    This return the number of visited mines in the minefield
+"""
 
 
 def num_visited_mines():
@@ -114,6 +158,11 @@ def num_visited_mines():
     return count
 
 
+"""
+    This returns and array of not visited pieces 
+"""
+
+
 def get_all_not_visited():
     arr = []
     for i in range(dim):
@@ -123,6 +172,11 @@ def get_all_not_visited():
     return arr
 
 
+"""
+    This marks all the not visited pieces as mines
+"""
+
+
 def mark_not_visited_as_mines():
     for i in range(dim):
         for j in range(dim):
@@ -130,6 +184,19 @@ def mark_not_visited_as_mines():
                 minefield[i][j].visited = True
                 if minefield[i][j].mine:
                     minefield[i][j].flagged = True
+
+
+"""
+    The basic method only follows two rules
+        1) get a start count of visited neighbors
+        2) for every visited piece
+            2.1) check if the number of discovered mines around it equals it's value. If so then every 
+                 unknown neighbor is safe
+            2.2) check if the number of total neighbors -visited safe neighbors = its value, then 
+                 every unknown neighbors is a mine
+        3) get end count of visited pieces 
+            3.3 if start count == end count and endcount < dim*dim, then pick a random unknown piece        
+"""
 
 
 def basic():
@@ -237,8 +304,6 @@ def basic():
 
     end_count = num_visited()
 
-    # print("start: " + str(start_count) + "end: " + str(end_count))
-
     if start_count == end_count:
         # visit a random state
         arr = get_all_not_visited()
@@ -246,13 +311,20 @@ def basic():
             rand = random.randint(0, len(arr) - 1)
             arr[rand].visited = True
 
-            # print("i: " + str(arr[rand].i) + " j: " + str(arr[rand].j) + " value: " + str(arr[rand].value))
-
     # indite when to stop
     if end_count == (dim * dim):
         return False
     else:
         return True
+
+
+"""
+    get_neighbors()
+        
+        parameter: a piece on the minefield
+        
+        returns: all the neighbors of the input in an array
+"""
 
 
 def get_neighbors(point):
@@ -286,6 +358,15 @@ def get_neighbors(point):
     return arr
 
 
+"""
+    get_number_of_not_visited_neighbors()
+    
+        parameter: a piece on the minefield
+        
+        returns: the number of not visited neighbors around the input
+"""
+
+
 def get_number_of_not_visited_neighbors(point):
     count = 0
     if (point.i - 1) >= 0:
@@ -314,6 +395,15 @@ def get_number_of_not_visited_neighbors(point):
             count += 1
 
     return count
+
+
+"""
+    get_number_of_visited_neighbor_mines()
+    
+        parameter: a piece on the minefield
+        
+        returns: the number of visited mines around the input
+"""
 
 
 def get_number_of_visited_neighbor_mines(point):
@@ -346,10 +436,22 @@ def get_number_of_visited_neighbor_mines(point):
     return count
 
 
+"""
+    calculate_prob():
+    
+        input: a piece on the minefield
+        
+        returns the prob of the piece being a mine
+        
+    This looks at the inputs visited neighbors and calculates the probability that it self is a mine
+    based on the neighbors value and the neighbors unknown neighbors
+"""
+
+
 def calculate_prob(point):
     neighbors = get_neighbors(point)
 
-    prob = 0.5
+    prob = 0.0
     count = 0
 
     for i in neighbors:
@@ -370,9 +472,30 @@ def calculate_prob(point):
             count += 1
 
     if count == 0:
-        return 0.5
+        # unkown cell prob will be 0.5 without global info
+        # this is for regular advanced algo
+        if strat == 2:
+            return 0.5
+
+        # This takes in account of global info
+        # This is for extra credit. (Allowed to access the total number of mines)
+        prob = (num_mines - num_visited_mines()) / len(get_all_not_visited())
+        return prob
+
     else:
         return prob / count
+
+
+"""
+    strat2()
+    
+    input: the pygame screen
+    
+    strata 2 calculates the probability of all unknown pieces,
+        if the prob is 0 it visits it, if 1 then it flags it
+    if the start count of visted pieces == end count of visited pieces then it picks the piece with 
+    the lowest probability
+"""
 
 
 def strat2(screen):
@@ -387,18 +510,15 @@ def strat2(screen):
                 if prob == 0:
                     # safe cell, mark it as visited
                     minefield[i][j].visited = True
-                    # print("SAFE i: " + str(i) + " j: " + str(j) + " " + str(minefield[i][j].prob))
+
                 if prob == 1:
                     # mine 100% for flag it
                     minefield[i][j].visited = True
                     minefield[i][j].flagged = True
-                    # print("MINE i: " + str(i) + " j: " + str(j) + " " + str(minefield[i][j].prob))
 
             update_screen(screen)
 
     end_count = num_visited()
-
-    # print("start: " + str(start_count) + "end: " + str(end_count))
 
     # if end = star, # pick the one with the min prob
     if end_count < dim * dim:
@@ -416,14 +536,11 @@ def strat2(screen):
             for i in range(dim):
                 for j in range(dim):
                     if (minefield[i][j].prob < min_prob) and (minefield[i][j].visited == False):
-                        # print("i: " + str(minefield[i][j].i) + " j: " + str(minefield[i][j].j) + " " + str(minefield[i][j].prob))
-
                         min_prob = minefield[i][j].prob
                         x = i
                         y = j
 
             minefield[x][y].visited = True
-            # print("Marked random as visited i: " + str(x) + " j: " + str(y) + " " + str(minefield[i][j].prob))
             update_screen(screen)
 
             # true so keep going
@@ -431,10 +548,17 @@ def strat2(screen):
 
     # searched all so u can stop now
     if end_count == (dim * dim):
-        # print("start: " + str(start_count) + "end: " + str(end_count))
         return False
 
     return True
+
+
+"""
+    game_loop()
+    
+    runs until the algoritim visits all the pieces on the minefield
+    and updates the screen
+"""
 
 
 def game_loop(screen):
@@ -456,6 +580,13 @@ def game_loop(screen):
         update_screen(screen)
 
 
+"""
+    create_minefield():
+    
+    creates a arr[dim][dim] of pieces
+"""
+
+
 def create_minefield():
     # initialze array
     arr = [[Piece(0, 0, 0) for i in range(dim)] for j in range(dim)]
@@ -472,6 +603,17 @@ def create_minefield():
             i += 1
 
     return arr
+
+
+"""
+    assign_mine_values(arr)
+    
+    input: minefield
+    
+    returns: minefield
+    
+    assigns the proper i, j, total_neighbors, and value of the Piece
+"""
 
 
 def assign_mine_values(arr):
@@ -522,13 +664,26 @@ def assign_mine_values(arr):
     return arr
 
 
+"""
+    initialize_minefield():
+    creates the minefield
+"""
+
+
 def initialize_minefield():
     arr = create_minefield()
     arr = assign_mine_values(arr)
     return arr
 
 
-def get_falgged_count():
+"""
+    get_flagged_count():
+    
+    returns the number of flagged pieces in the minefield
+"""
+
+
+def get_flagged_count():
     count = 0
     for i in range(dim):
         for j in range(dim):
@@ -547,12 +702,13 @@ def main():
 
     dim = int(input("Enter the dimension of minefield: "))
     num_mines = int(input("Enter the number of mines:  "))
-    strat = int(input("Strat 1 (basic) or Strat 2 (smart). Enter 1 or 2 "))
+    strat = int(input(
+        "Strat 1 (basic) or Strat 2 (smart) or Strat 3 (Extra credit. Strat 2 with global info). Enter 1 or 2 or 3"))
 
     if (strat == 1):
         time_sleep = 1
     if (strat == 2 and dim > 10):
-        time_sleep = 0
+        time_sleep = 3
     # get all the sprites10
     loadImages()
 
@@ -567,11 +723,17 @@ def main():
 
     game_loop(screen)
 
-    print("There were " + str(num_mines) + " and " + str(get_falgged_count()) + " were flagged")
-    print("success rate: " + str(get_falgged_count() / num_mines))
+    print("There were " + str(num_mines) + " and " + str(get_flagged_count()) + " were flagged")
+    print("success rate: " + str(get_flagged_count() / num_mines))
 
 
 main()
+
+
+"""
+    This was just used for testing disregard the bottom
+"""
+
 
 def testing_main():
     global dim, num_mines, minefield, size, time_sleep, strat
@@ -583,7 +745,7 @@ def testing_main():
 
     dim = 10
     num_mines = 90
-    strat = 1
+    strat = 2
 
     # get all the sprites10
     loadImages()
@@ -599,17 +761,16 @@ def testing_main():
 
     game_loop(screen)
 
-    print("There were " + str(num_mines) + " and " + str(get_falgged_count()) + " were flagged")
-    print("success rate: " + str(get_falgged_count() / num_mines))
+    print("There were " + str(num_mines) + " and " + str(get_flagged_count()) + " were flagged")
+    print("success rate: " + str(get_flagged_count() / num_mines))
 
-    return get_falgged_count() / num_mines
+    return get_flagged_count() / num_mines
 
 
 def test():
     total = 0
-    for i in range(10):
+    for i in range(3):
         total += testing_main()
-    print(str(total / 10))
+    print(str(total / 3))
 
-
-#test()
+# test()
